@@ -1,0 +1,50 @@
+{% extends 'map/base.html' %}
+
+{% block content %}
+  <div id="map" style="height: 40vw;"></div>
+
+  <script>
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 7.5,
+        center: new google.maps.LatLng(40.177200, 44.503490)
+      });
+
+      var markers = [];
+
+      {% for antenna in antennas %}
+        // Создаем отдельный объект contentString для каждой антенны
+        var contentString_{{ antenna.id }} = '<div><p><b>Name:</b> {{ antenna.name }}</p><p><b>Configuration:</b> {{ antenna.configuration }}</p><p><b>Latitude:</b> {{ antenna.latitude }}</p><p><b>Longitude:</b> {{ antenna.longitude }}</p></div>';
+
+        // Создаем маркер и информационное окно для каждой антенны
+        var marker_{{ antenna.id }} = new google.maps.Marker({
+          position: new google.maps.LatLng({{ antenna.latitude }}, {{ antenna.longitude }}),
+          map: map,
+           icon: {
+                  url: 'https://p1.hiclipart.com/preview/418/147/606/flag-cell-site-telecommunications-tower-mobile-phones-cellular-network-base-station-antenna-jio-png-clipart.jpg',
+                  anchor: new google.maps.Point(30, 30),
+                  scaledSize: new google.maps.Size(30, 30)
+                },
+          title: '{{ antenna.name }}'
+        });
+
+        var infowindow_{{ antenna.id }} = new google.maps.InfoWindow({
+          content: contentString_{{ antenna.id }}
+        });
+
+        // Добавляем обработчик событий для каждой антенны
+        marker_{{ antenna.id }}.addListener('click', function() {
+          infowindow_{{ antenna.id }}.open(map, marker_{{ antenna.id }});
+        });
+
+        markers.push(marker_{{ antenna.id }});
+
+      {% endfor %}
+
+    }
+  </script>
+
+  <script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlBKWSM0L3j5oZN5Wx1NYX6AwNxmzBqGY&callback=initMap">
+  </script>
+{% endblock %}
